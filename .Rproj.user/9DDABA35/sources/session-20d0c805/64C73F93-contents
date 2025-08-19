@@ -1,0 +1,21 @@
+Package: CampoPixel
+Type: Package
+Title: Processamento de Imagens RGB para Agricultura de Digital
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Wilhan", "Valasco",
+      email = "wilhanvalasco@hotmail.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: O CampoPixel fornece ferramentas para processamento e análise 
+    de imagens RGB capturadas por diferentes dispositivos (celulares, drones e 
+    satélites), com foco em aplicações no agronegócio. O pacote permite o cálculo 
+    de índices de vegetação como o NDGR (Normalized Difference Green-Red) e a 
+    estimativa de solo exposto, auxiliando em estudos de monitoramento agrícola, 
+    avaliação de cobertura vegetal e suporte à agricultura digital.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
