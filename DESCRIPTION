@@ -9,8 +9,6 @@ Authors@R: c(
     person(given = "Walter Baida", family = "Garcia Coutinho", role = "aut",
            email = "walterbgc@gmail.com")
 )
-Author: Wilhan Valasco [aut, cre], Walter Baida [aut]
-Maintainer: Wilhan Valasco <wilhanvalasco@hotmail.com>
 Description: O CampoPixel fornece um fluxo reprodutível para processamento e
     análise de imagens RGB capturadas por celulares, drones e satélites,
     visando aplicações em agricultura digital. As funções implementam etapas
@@ -21,7 +19,6 @@ Description: O CampoPixel fornece um fluxo reprodutível para processamento e
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-LazyLoad: true
 Depends: R (>= 4.1.0)
 Imports:
     EBImage,
