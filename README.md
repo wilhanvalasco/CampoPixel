@@ -1,4 +1,4 @@
-<img src="/Users/wilhanvalasco/Library/CloudStorage/GoogleDrive-wilhanvalasco@gmail.com/Meu%20Drive/WW%20DATA%20SOLUTIONS/Pacotes/CampoPixel_VF/logo_campo_pixel.png" width="16%" height="16%" align="right">
+<img align="right" src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/logo_campo_pixel.png" width="16%" height="16%">
 
 <h2 align="center">Campo Pixel </h2>
 *Uma biblioteca R inteligente que transforma pixels em insights na agricultura.*
@@ -31,10 +31,11 @@ Para obter bons resultados, priorize **imagens bem iluminadas, nítidas e sem so
 </details>
 
 ---
+
 <h2 align="center">Exemplo visual de captura </h2>
 
 <p align="center">
-  <img src="/Users/wilhanvalasco/Library/CloudStorage/GoogleDrive-wilhanvalasco@gmail.com/Meu%20Drive/WW%20DATA%20SOLUTIONS/Pacotes/CampoPixel_VF/exemplo.png" alt="Exemplo de captura" width="72%">
+  <img src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/exemplo.png" alt="Exemplo de captura" width="72%">
 </p>
 
 ---
@@ -46,11 +47,11 @@ A seguir, exemplos que ilustram a diferença entre a imagem original e o resulta
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="/Users/wilhanvalasco/Library/CloudStorage/GoogleDrive-wilhanvalasco@gmail.com/Meu%20Drive/WW%20DATA%20SOLUTIONS/Pacotes/CampoPixel_VF/campo1.jpeg" alt="Imagem RGB original" width="96%"><br>
+      <img src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/campo1.jpeg" alt="Imagem RGB original" width="96%"><br>
       <em>Imagem original (RGB capturada por drone)</em>
     </td>
     <td align="center" width="50%">
-      <img src="/Users/wilhanvalasco/Library/CloudStorage/GoogleDrive-wilhanvalasco@gmail.com/Meu%20Drive/WW%20DATA%20SOLUTIONS/Pacotes/CampoPixel_VF/campo_processado.png" alt="Resultado processado" width="96%"><br>
+      <img src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/campo_processado.png" alt="Resultado processado" width="96%"><br>
       <em>Imagem processada (saída gerada pelo pacote)</em>
     </td>
   </tr>
@@ -60,11 +61,12 @@ Essas figuras demonstram como o pacote transforma uma imagem RGB convencional em
 
 ---
 
-### Instalção
+### Instalação
 ```r
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("wilhanvalasco/CampoPixel")
 library(CampoPixel)
+
 ```
 
 ### Funções
@@ -104,7 +106,7 @@ help(crop_im)
 <td align="center" width="50%" style="padding:0; vertical-align:top;">
 <div style="border-radius:16px; padding:18px 20px; text-align:center; background-image:linear-gradient(#ffffff,#ffffff),linear-gradient(135deg,#4f46e5,#22c55e,#06b6d4); background-origin:border-box; background-clip:padding-box, border-box; border:1px solid transparent; box-shadow:0 8px 24px rgba(2,6,23,.10);">
 
-<img src="wilhan.jpg" 
+<img src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/wilhan.jpg" 
      alt="Foto de Wilhan Valasco" 
      width="112" height="112"
      style="display:block; margin:0 auto 12px; width:112px; height:112px; border-radius:50%; object-fit:cover; object-position: top; box-shadow:0 0 0 3px #fff, 0 6px 16px rgba(2,6,23,.18); background:#e2e8f0;">
@@ -116,7 +118,7 @@ help(crop_im)
 </td>
 <td align="center" width="50%" style="padding:0; vertical-align:top;">
 <div style="border-radius:16px; padding:18px 20px; text-align:center; background-image:linear-gradient(#ffffff,#ffffff),linear-gradient(135deg,#4f46e5,#22c55e,#06b6d4); background-origin:border-box; background-clip:padding-box, border-box; border:1px solid transparent; box-shadow:0 8px 24px rgba(2,6,23,.10);">
-<img src="baida.jpg" 
+<img rc="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/baida.jpg"
      alt="Foto de Walter Baida" 
      width="112" height="112"
      style="display:block; margin:0 auto 12px; width:112px; height:112px; border-radius:50%; object-fit:cover; object-position: top; box-shadow:0 0 0 3px #fff, 0 6px 16px rgba(2,6,23,.18); background:#e2e8f0;">
