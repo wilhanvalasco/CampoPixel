@@ -1,21 +1,44 @@
 Package: CampoPixel
 Type: Package
-Title: Processamento de Imagens RGB para Agricultura de Digital
+Title: Processamento e Análise de Imagens RGB para Agricultura
 Version: 0.1.0
+Date: 2025-08-20
 Authors@R: c(
-    person(
-      "Wilhan", "Valasco",
-      email = "wilhanvalasco@hotmail.com",
-      role = c("aut", "cre")
-    )
-  )
-Description: O CampoPixel fornece ferramentas para processamento e análise 
-    de imagens RGB capturadas por diferentes dispositivos (celulares, drones e 
-    satélites), com foco em aplicações no agronegócio. O pacote permite o cálculo 
-    de índices de vegetação como o NDGR (Normalized Difference Green-Red) e a 
-    estimativa de solo exposto, auxiliando em estudos de monitoramento agrícola, 
-    avaliação de cobertura vegetal e suporte à agricultura digital.
+    person(given = "Wilhan Valasco", family = "dos Santos", role = c("aut", "cre"),
+           email = "wilhanvalasco@hotmail.com"),
+    person(given = "Walter Baida", family = "Garcia Coutinho", role = "aut",
+           email = "walterbgc@gmail.com")
+)
+Author: Wilhan Valasco [aut, cre], Walter Baida [aut]
+Maintainer: Wilhan Valasco <wilhanvalasco@hotmail.com>
+Description: O CampoPixel fornece um fluxo reprodutível para processamento e
+    análise de imagens RGB capturadas por celulares, drones e satélites,
+    visando aplicações em agricultura digital. As funções implementam etapas
+    de pré-processamento, cálculo de índices de vegetação (p.ex., NDGR -
+    Normalized Difference Green-Red), segmentação e estimativa de solo exposto,
+    além de geração de produtos visuais (mapas, sobreposições) e suporte a
+    paralelização para grandes volumes de imagens.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+LazyLoad: true
+Depends: R (>= 4.1.0)
+Imports:
+    EBImage,
+    scales,
+    parallel,
+    abind
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+URL: https://github.com/wilhanvalasco/CampoPixel
+BugReports: https://github.com/wilhanvalasco/CampoPixel/issues
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Remotes:
+    bioc::EBImage
+biocViews:
+    EBImage
+Config/testthat/edition: 3
