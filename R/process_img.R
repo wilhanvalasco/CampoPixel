@@ -79,7 +79,7 @@ process_img <- function(file_path, max_pixels = 5e6, angulo = 0) {
   if (dim(im)[1] > dim(im)[2]) {
     im <- rotate(im, angle = 90)
   }
-
+  im <- medianFilter(im, size = 5)
   img_list <- list()
   img_list$hist_rgb <- im
   setTxtProgressBar(pb, 1)
