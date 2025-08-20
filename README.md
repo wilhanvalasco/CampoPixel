@@ -1,5 +1,4 @@
 <img align="right" src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/logo_campo_pixel.png" width="16%" height="16%">
-
 <h2 align="center">Campo Pixel </h2>
 *Uma biblioteca R inteligente que transforma pixels em insights na agricultura.*
 
@@ -118,7 +117,7 @@ help(crop_im)
 </td>
 <td align="center" width="50%" style="padding:0; vertical-align:top;">
 <div style="border-radius:16px; padding:18px 20px; text-align:center; background-image:linear-gradient(#ffffff,#ffffff),linear-gradient(135deg,#4f46e5,#22c55e,#06b6d4); background-origin:border-box; background-clip:padding-box, border-box; border:1px solid transparent; box-shadow:0 8px 24px rgba(2,6,23,.10);">
-<img rc="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/baida.jpg"
+<img src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/baida.jpg"
      alt="Foto de Walter Baida" 
      width="112" height="112"
      style="display:block; margin:0 auto 12px; width:112px; height:112px; border-radius:50%; object-fit:cover; object-position: top; box-shadow:0 0 0 3px #fff, 0 6px 16px rgba(2,6,23,.18); background:#e2e8f0;">
