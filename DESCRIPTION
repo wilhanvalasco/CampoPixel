@@ -8,7 +8,7 @@ Authors@R: c(
            email = "wilhanvalasco@hotmail.com"),
     person(given = "Walter Baida", family = "Garcia Coutinho", role = "aut",
            email = "walterbgc@gmail.com")
-)
+ )
 Description: O CampoPixel fornece um fluxo reprodutível para processamento e
     análise de imagens RGB capturadas por celulares, drones e satélites,
     visando aplicações em agricultura digital. As funções implementam etapas
