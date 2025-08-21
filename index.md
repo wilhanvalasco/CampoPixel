@@ -11,23 +11,24 @@ Ele oferece um fluxo simples: **carregar → processar → visualizar/quantifica
 
 Para obter bons resultados, priorize **imagens bem iluminadas, nítidas e sem sombras** sobre a área de interesse.
 
-<details>
+<details markdown="1">
   <summary><strong>Roteiro prático (clique para expandir)</strong></summary>
 
-- Câmera reta ao solo (perpendicular), sem inclinação.  
-- Evitar ângulos >10° que causem distorções.  
-- Preferir luz difusa (céu nublado ou com nuvens finas).  
-- Evitar sol direto ao meio-dia e sombras sobre a área.  
-- Centralizar a cultura/solo, ocupar >80% do quadro.  
-- Não incluir pessoas, máquinas ou objetos no fundo.  
-- Resolução mínima: 180 PPI; formatos: .jpg, .png, .tif.  
-- Padronizar altura (ex.: 1,5 m solo; 0,5 m folhas).  
-- Capturar ≥3 imagens por ponto/talhão.  
-- Evitar vento forte ou solo encharcado/reflexivo.  
-- Nomear arquivos: `data_local_talhao_cultura_rep.jpg`.  
+- Câmera reta ao solo (perpendicular), sem inclinação.
+- Evitar ângulos >10° que causem distorções.
+- Preferir luz difusa (céu nublado ou com nuvens finas).
+- Evitar sol direto ao meio-dia e sombras sobre a área.
+- Centralizar a cultura/solo, ocupar >80% do quadro.
+- Não incluir pessoas, máquinas ou objetos no fundo.
+- Resolução mínima: 180 PPI; formatos: .jpg, .png, .tif.
+- Padronizar altura (ex.: 1,5 m solo; 0,5 m folhas).
+- Capturar ≥3 imagens por ponto/talhão.
+- Evitar vento forte ou solo encharcado/reflexivo.
+- Nomear arquivos: `data_local_talhao_cultura_rep.jpg`.
 - Organizar por pastas diárias de captura.
 
 </details>
+
 
 ---
 
