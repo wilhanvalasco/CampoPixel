@@ -90,7 +90,7 @@ Esta é a escala de cores utilizada para o **NDGR**.
        alt="Paleta de cores NDGR" width="50%">
 </p>
 
-O índice varia de **-1 a 1**: quanto menor o valor, menor a reflectância associada à vegetação — indicando áreas de solo exposto ou baixa cobertura vegetal.
+O índice varia de **-1 a 1**: quanto menor o valor, menor a reflectância associada à vegetação, indicando áreas de solo exposto ou baixa cobertura vegetal.
      
 ---
 
