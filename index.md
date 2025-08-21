@@ -60,7 +60,61 @@ Essas figuras demonstram como o pacote transforma uma imagem RGB convencional em
 
 ---
 
-### Instalação
+<h2 align="center">Saídas da função `process_im()` </h2>
+
+A função `process_im()` retorna métricas que ajudam a interpretar o estado da vegetação e do solo a partir de imagens RGB.  
+As principais saídas são o **NDGR** e o **percentual de solo exposto**.
+
+---
+
+### 1. **NDGR – Normalized Difference Green-Red Index**
+
+O **NDGR** (*Normalized Difference Green-Red Index*) é um índice espectral que mede a diferença relativa entre os canais **verde (G)** e **vermelho (R)** da imagem.  
+Sua fórmula é:
+
+\[
+NDGR = \frac{G - R}{G + R}
+\]
+
+- **G**: intensidade da banda verde.  
+- **R**: intensidade da banda vermelha.  
+
+Esse índice destaca áreas com maior presença de verde em relação ao vermelho, permitindo identificar vegetação ativa quando não há disponibilidade de bandas no infravermelho (como NDVI).  
+É uma métrica útil em análises de imagens RGB capturadas por drones, câmeras ou satélites de baixa resolução.
+
+Esta é a escala de cores utilizada para o **NDGR**.  
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/paleta.png" 
+       alt="Paleta de cores NDGR" width="50%">
+</p>
+
+O índice varia de **-1 a 1**: quanto menor o valor, menor a reflectância associada à vegetação — indicando áreas de solo exposto ou baixa cobertura vegetal.
+     
+---
+
+### 2. **Solo – Percentual de Solo Exposto**
+
+O indicador **Solo** representa o **percentual de solo exposto** na imagem.  
+
+- Se a saída indicar **60% de solo exposto**, significa que os outros **40% correspondem à vegetação** (ou outros elementos não classificados como solo).  
+- O cálculo é realizado por meio de **segmentação da imagem RGB**, em que os pixels são classificados em duas grandes categorias: **solo** e **vegetação**.  
+- Após a segmentação, é feita a razão entre o número de pixels classificados como solo e o total da imagem, resultando em um valor percentual.
+
+Esse indicador é fundamental para estudos de **cobertura vegetal, erosão e práticas de manejo agrícola**, pois fornece uma visão quantitativa do quanto da superfície está descoberta.
+
+---
+
+### 3. **Resumo Técnico**
+
+| Saída do `process_im()` | Significado                          | Método de Cálculo                        |
+|--------------------------|--------------------------------------|------------------------------------------|
+| **NDGR**                 | Índice verde–vermelho normalizado    | \((G - R) / (G + R)\) com bandas RGB     |
+| **Solo (%)**             | Percentual de solo exposto           | Segmentação de pixels RGB em solo/vegetação |
+
+---
+
+<h2 align="center">Configurações do `CampoPixel` </h2>
 ```r
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("wilhanvalasco/CampoPixel")
