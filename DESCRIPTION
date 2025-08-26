@@ -9,22 +9,31 @@ Authors@R: c(
     person(given = "Walter Baida", family = "Garcia Coutinho", role = "aut",
            email = "walterbgc@gmail.com")
  )
-Description: O CampoPixel fornece um fluxo reprodutível para processamento e
-    análise de imagens RGB capturadas por celulares, drones e satélites,
-    visando aplicações em agricultura digital. As funções implementam etapas
-    de pré-processamento, cálculo de índices de vegetação (p.ex., NDGR -
-    Normalized Difference Green-Red), segmentação e estimativa de solo exposto,
-    além de geração de produtos visuais (mapas, sobreposições) e suporte a
-    paralelização para grandes volumes de imagens.
+Description: O CampoPixel oferece uma solução integrada e reprodutível para o
+    processamento e análise de imagens RGB capturadas por celulares, drones e
+    satélites, com foco em aplicações de agricultura digital e sensoriamento remoto.
+    O pacote implementa uma sequência completa de operações, incluindo
+    pré-processamento automatizado, recorte poligonal interativo,
+    redimensionamento proporcional, cálculo do índice NDGR (Normalized Difference
+    Green-Red), segmentação de solo exposto e geração de produtos derivados como
+    mapas em gradiente NDGR, imagens segmentadas e sobreposições visuais.
+    Inclui também estimativas quantitativas como NDGR médio e percentual de solo
+    exposto, visualização interativa e suporte à paralelização para grandes volumes
+    de dados. Ideal para pesquisadores, agrônomos e profissionais que atuam com
+    monitoramento de vegetação e interpretação de imagens em ambientes agrícolas.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 4.1.0)
 Imports:
-    EBImage,
+   EBImage,
     scales,
     parallel,
-    abind
+    abind,
+    grid,
+    grDevices
+Remotes:
+    bioc::EBImage
 Suggests:
     knitr,
     rmarkdown,
@@ -34,8 +43,6 @@ URL: https://github.com/wilhanvalasco/CampoPixel
 BugReports: https://github.com/wilhanvalasco/CampoPixel/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Remotes:
-    bioc::EBImage
 biocViews:
     EBImage
 Config/testthat/edition: 3

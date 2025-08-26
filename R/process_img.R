@@ -1,42 +1,56 @@
-#' Função para processamento de imagens RGB
+#' Função para processamento de imagens RGB com segmentação de solo.
 #'
 #' Esta função processa imagens RGB obtidas por diferentes dispositivos
-#' (celular, drone ou satélite) e retorna o Índice de Diferença Normalizada
-#' Verde-Vermelho (NDGR) e o percentual de solo exposto na imagem.
+#' (celular, drone ou satélite) e retorna métricas relacionadas ao índice NDGR
+#' (Índice de Diferença Normalizada Verde-Vermelho) e à segmentação do solo exposto.
 #'
-#' @param file_path Caminho do arquivo de imagem (formato suportado pelo EBImage).
-#' Caso não seja fornecido, a função pode utilizar uma imagem já carregada em memória.
-#'
+#' @param imagem Caminho para o arquivo de imagem (formato suportado pelo EBImage) ou
+#' um objeto do tipo Image já carregado. A função detecta automaticamente o tipo.
 #' @param max_pixels Número máximo de pixels permitido para a imagem
-#' (padrão = 5e6). Imagens maiores serão redimensionadas proporcionalmente
-#' para reduzir o uso de memória e tempo de processamento.
-#'
+#' (padrão = 5e6). Imagens maiores são redimensionadas proporcionalmente para
+#' reduzir o uso de memória e o tempo de processamento.
 #' @param angulo Ângulo de rotação aplicado à imagem em graus
-#' (padrão = 0, sem rotação).
+#' (padrão = 0, sem rotação). Útil para ajustar a orientação.
+#' @param size_filter Tamanho do filtro da mediana (padrão = 5). Valores maiores
+#' suavizam mais a imagem.
+#'
+#' @return Uma lista contendo:
+#' \itemize{
+#' \item \code{true_color} - Imagem original (sem redimensionamento, rotação ou filtro).
+#' \item \code{NDGR} - Matriz do Índice de Diferença Normalizada Verde-Vermelho.
+#' \item \code{im_binary} - Imagem binária segmentada com base no NDGR.
+#' \item \code{solo_exp} - Porcentagem de solo exposto na imagem (entre 0 e 1).
+#' \item \code{rgb_map} - Mapa colorido representando o NDGR segmentado.
+#' \item \code{NDGR_medio} - Valor médio do NDGR considerando apenas os pixels segmentados.
+#' \item \code{Imagem_final} - Imagem final com sobreposição do gradiente NDGR.
+#' }
+#'
+#' @details
+#' A função depende dos seguintes pacotes: EBImage, scales, parallel, abind, grid, grDevices.
+#' Esses pacotes são automaticamente carregados ao executar a função.
 #'
 #' @examples
-#' # Exemplo de uso da função process_img()
+#' # Carregue a imagem diretamente ou informe o caminho
+#' im <- EBImage::readImage(system.file("images", "sample.png", package = "EBImage"))
 #'
-#' # Defina o caminho da pasta onde a imagem está localizada
-#' caminho <- "caminho/para/sua/pasta"
-#' setwd(caminho)
-#'
-#' # Liste os arquivos disponíveis na pasta
-#' dir(caminho)
-#'
-#' # Leia uma imagem RGB (exemplo com nome fictício)
-#' im <- readImage("exemplo_imagem.JPG")
+#' # Execute o processamento (sem redimensionamento e com filtro 3x3)
+#' resultado <- process_img(imagem = im, angulo = 0, size_filter = 3)
 #'
 #' # Visualize a imagem original
-#' display(im, method = "r")
+#' EBImage::display(resultado$true_color, method = "raster")
 #'
-#' # Processe a imagem com rotação de -90 graus
-#' resultado <- process_img("exemplo_imagem.JPG", angulo = -90)
+#' # Visualize a imagem final com gradiente NDGR
+#' EBImage::display(resultado$Imagem_final, method = "raster")
 #'
-#' # O objeto 'resultado' conterá o NDGR e o percentual de solo exposto
+#' # Acesse os resultados:
+#' resultado$NDGR # Matriz NDGR
+#' resultado$im_binary # Máscara binária do solo exposto
+#' resultado$solo_exp # Proporção de solo exposto
+#' resultado$rgb_map # Mapa colorido
+#' resultado$NDGR_medio # NDGR médio da imagem
 #'
 #' @export
-process_img <- function(file_path, max_pixels = 5e6, angulo = 0) {
+process_img <- function(imagem, max_pixels = 5e6, angulo = 0, size_filter = 5) {
   if (!require(EBImage)) {
     install.packages("BiocManager")
     BiocManager::install("EBImage")
@@ -45,60 +59,65 @@ process_img <- function(file_path, max_pixels = 5e6, angulo = 0) {
   if (!require(scales)) install.packages("scales")
   if (!require(parallel)) install.packages("parallel")
   if (!require(abind)) install.packages("abind")
+  if (!require(grid)) install.packages("grid")
+  if (!require(grDevices)) install.packages("grDevices")
+
   library(scales)
   library(parallel)
   library(abind)
+  library(grid)
+  library(grDevices)
 
   steps <- 8
   pb <- txtProgressBar(min = 0, max = steps, style = 3)
 
-  if (exists("im") && inherits(im, "Image")) {
-    im <- im
-  } else if (!missing(file_path) && file.exists(file_path)) {
+  if (inherits(imagem, "Image")) {
+    imagem_coletada <- imagem
+  } else if (is.character(imagem) && file.exists(imagem)) {
     cat("Carregando imagem a partir do caminho informado.\n")
-    im <- readImage(file_path)
+    imagem_coletada <- readImage(imagem)
 
-    if (numberOfFrames(im) > 1) {
-      im <- getFrame(im, 1)
+    if (numberOfFrames(imagem_coletada) > 1) {
+      imagem_coletada <- getFrame(imagem_coletada, 1)
     }
 
-    if (length(dim(im)) == 3 && dim(im)[3] == 4) {
-      im <- im[,,1:3]
+    if (length(dim(imagem_coletada)) == 3 && dim(imagem_coletada)[3] == 4) {
+      imagem_coletada <- imagem_coletada[,,1:3]
     }
   } else {
-    stop("Nenhuma imagem válida fornecida.")
+    stop("O argumento 'imagem' deve ser um objeto 'Image' ou um caminho de arquivo válido.")
   }
 
-  total_pixels <- prod(dim(im))
-  if (total_pixels > max_pixels) {
-    fator <- sqrt(max_pixels / total_pixels)
-    im <- resize(im, w = dim(im)[2] * fator, h = dim(im)[1] * fator)
-    message(sprintf("Imagem redimensionada para %dx%d", dim(im)[2], dim(im)[1]))
-  }
-
-  if (dim(im)[1] > dim(im)[2]) {
-    im <- rotate(im, angle = 90)
-  }
-  im <- medianFilter(im, size = 5)
   img_list <- list()
-  img_list$hist_rgb <- im
+  img_list$true_color <- imagem_coletada
   setTxtProgressBar(pb, 1)
 
-  R <- im[,,1]
-  G <- im[,,2]
+  total_pixels <- prod(dim(imagem_coletada))
+  if (total_pixels > max_pixels) {
+    fator <- sqrt(max_pixels / total_pixels)
+    imagem_coletada <- resize(imagem_coletada, w = dim(imagem_coletada)[2] * fator, h = dim(imagem_coletada)[1] * fator)
+    cat(sprintf("\nImagem redimensionada para:\n%dx%d\n", dim(imagem_coletada)[2], dim(imagem_coletada)[1]))
+  }
+
+  if (dim(imagem_coletada)[1] > dim(imagem_coletada)[2]) {
+    imagem_coletada <- rotate(imagem_coletada, angle = 90)
+  }
+  imagem_coletada <- medianFilter(imagem_coletada, size = size_filter)
+
+  R <- imagem_coletada[,,1]
+  G <- imagem_coletada[,,2]
   denom <- R + G
   denom[denom == 0] <- NA
   NDGR <- (G - R) / denom
-  img_list$ndgr <- NDGR
+  img_list$NDGR <- NDGR
   setTxtProgressBar(pb, 2)
 
   NDGR_gray <- channel(NDGR, "gray")
   limiar <- otsu(NDGR_gray, range = c(-2, 2))
   seg <- NDGR_gray > limiar
   seg[seg == 0] <- NA
-  img_list$segmentation <- seg
+  img_list$im_binary <- seg
 
-  # Cálculo de solo exposto
   total_pix <- sum(!is.na(seg)) + sum(is.na(seg))
   solo_pix <- sum(is.na(seg))
   img_list$solo_exp <- solo_pix / total_pix
@@ -106,19 +125,18 @@ process_img <- function(file_path, max_pixels = 5e6, angulo = 0) {
   setTxtProgressBar(pb, 3)
 
   seg_array <- as.array(seg)
-  im_array <- as.array(im)
-  im_segmented <- im_array
+  imagem_array <- as.array(imagem_coletada)
+  imagem_segmentada <- imagem_array
   for (i in 1:3) {
-    channel <- im_array[,,i]
+    channel <- imagem_array[,,i]
     channel[is.na(seg_array)] <- 0
-    im_segmented[,,i] <- channel
+    imagem_segmentada[,,i] <- channel
   }
-  im_segmented <- Image(im_segmented, colormode = Color)
-  img_list$imagem_segmentada <- im_segmented
+  imagem_segmentada <- Image(imagem_segmentada, colormode = Color)
   setTxtProgressBar(pb, 4)
 
-  R2 <- im_segmented[,,1]
-  G2 <- im_segmented[,,2]
+  R2 <- imagem_segmentada[,,1]
+  G2 <- imagem_segmentada[,,2]
   denom2 <- G2 + R2
   denom2[denom2 == 0] <- NA
   NDGR2 <- (G2 - R2) / denom2
@@ -132,7 +150,6 @@ process_img <- function(file_path, max_pixels = 5e6, angulo = 0) {
 
   scaled_vals <- (ndgr_vals[mask] + 1) / 2
 
-  # Novo degradê
   custom_palette <- colorRamp(c("darkred", "red", "yellow", "orange", "lightgreen", "darkgreen", "blue", "darkblue"))
   gradient_colors <- custom_palette(scaled_vals)
 
@@ -148,151 +165,59 @@ process_img <- function(file_path, max_pixels = 5e6, angulo = 0) {
   img_list$NDGR_medio <- NDGR_m
   setTxtProgressBar(pb, 6)
 
-  overlay <- as.array(im)
+  overlay <- as.array(imagem_coletada)
   overlay[,,1][mask] <- red[mask]
   overlay[,,2][mask] <- green[mask]
   overlay[,,3][mask] <- blue[mask]
   overlay_image <- Image(overlay, colormode = Color)
-
-  # ====== Barra de cor (igual antes) ======
-  bar_height <- 50
-  bar_width <- round(dim(overlay)[2] * 0.25)
-  bar_palette <- colorRampPalette(c("darkred", "red", "yellow", "orange", "lightgreen", "darkgreen", "blue", "darkblue"))(bar_width)
-  bar_img <- array(0, dim = c(bar_height, bar_width, 3))
-  for (i in 1:bar_width) {
-    col <- col2rgb(bar_palette[i]) / 255
-    bar_img[ , i, 1] <- col[1]
-    bar_img[ , i, 2] <- col[2]
-    bar_img[ , i, 3] <- col[3]
-  }
-
-  ndgr_pos <- round((NDGR_m + 1) / 2 * bar_width)
-  ndgr_pos <- min(max(ndgr_pos, 2), bar_width - 1)
-  bar_img[ , (ndgr_pos-1):(ndgr_pos+1), ] <- 1
-
-  combined_array <- as.array(overlay_image)
-  x_start <- dim(combined_array)[2] - bar_width - 20
-  y_start <- dim(combined_array)[1] - bar_height - 20
-  for (i in 1:bar_height) {
-    for (j in 1:bar_width) {
-      for (k in 1:3) {
-        combined_array[y_start + i, x_start + j, k] <- bar_img[i, j, k]
-      }
-    }
-  }
-
-  # ====== Fonte 5x7 (mesma p/ ambas as caixas) ======
-  font_5x7 <- list(
-    "N" = c("10001","11001","10101","10011","10001"),
-    "D" = c("11100","10010","10001","10010","11100"),
-    "G" = c("01110","10000","10111","10001","01110"),
-    "R" = c("11110","10001","11110","10100","10010"),
-    ":" = c("00000","00100","00000","00100","00000"),
-    "." = c("00000","00000","00000","00000","00100"),
-    "0" = c("01110","10001","10001","10001","01110"),
-    "1" = c("00100","01100","00100","00100","01110"),
-    "2" = c("01110","00001","01110","10000","11111"),
-    "3" = c("01110","00001","00110","00001","01110"),
-    "4" = c("00010","00110","01010","11111","00010"),
-    "5" = c("11111","10000","11110","00001","11110"),
-    "6" = c("01110","10000","11110","10001","01110"),
-    "7" = c("11111","00001","00010","00100","00100"),
-    "8" = c("01110","10001","01110","10001","01110"),
-    "9" = c("01110","10001","01111","00001","01110"),
-    " " = c("00000","00000","00000","00000","00000"),
-    "S" = c("01110","10000","01110","00001","01110"),
-    "O" = c("01110","10001","10001","10001","01110"),
-    "L" = c("10000","10000","10000","10000","11111")
-  )
-
-  # ====== Função única p/ desenhar caixa branca com texto (usada nas duas legendas) ======
-  draw_white_label <- function(arr, x_center, y_top, texto, escala = 5, pad = 4, font = font_5x7) {
-    lab_h <- 7 * escala + pad
-    lab_w <- (nchar(texto) * 6 * escala) + pad
-    # centraliza no x desejado
-    x0 <- round(x_center - lab_w / 2)
-    x0 <- max(1, x0)
-    x1 <- min(x0 + lab_w - 1, dim(arr)[2])
-    # garante que cabe verticalmente
-    y0 <- max(1, y_top)
-    y1 <- min(y0 + lab_h - 1, dim(arr)[1])
-    # fundo branco
-    for (iy in y0:y1) {
-      for (jx in x0:x1) {
-        arr[iy, jx, ] <- 1
-      }
-    }
-    # texto preto
-    tx <- x0 + 4
-    ty <- y0 + 6
-    for (char in strsplit(texto, "")[[1]]) {
-      matriz <- font[[char]]
-      if (!is.null(matriz)) {
-        for (dy in 0:4) {
-          linha_original <- strsplit(matriz[5 - dy], "")[[1]]
-          if (length(linha_original) < 5) next
-          for (dx in 0:4) {
-            if (linha_original[dx + 1] == "1") {
-              for (sx in 0:(escala - 1)) {
-                for (sy in 0:(escala - 1)) {
-                  px <- tx + dx * escala + sx
-                  py <- ty + dy * escala + sy
-                  if (px > 0 && px <= dim(arr)[2] && py > 0 && py <= dim(arr)[1]) {
-                    arr[py, px, ] <- 0
-                  }
-                }
-              }
-            }
-          }
-        }
-        tx <- tx + 6 * escala
-      }
-    }
-    invisible(list(arr = arr, bbox = c(x0 = x0, y0 = y0, x1 = x1, y1 = y1), width = lab_w, height = lab_h))
-  }
-
-  # ====== Legenda SOLO (CAIXA 1) ======
-  escala <- 3
-  texto_solo <- sprintf("SOLO: %.2f", img_list$solo_exp*100)
-  # posição x central exatamente no marcador da barra
-  ndgr_center_x <- x_start + ndgr_pos
-  # posiciona ACIMA da barra (mesmo comportamento de antes)
-  ndgr_y_top <- y_start - (7 * escala + 4) - 5
-  ndgr_y_top <- max(1, ndgr_y_top)
-  # >>> deslocar 20% para baixo <<<
-  # >>> deslocar 20% para BAIXO <<<
-  deslocamento_20 <- round(0.05 * dim(combined_array)[1])
-  ndgr_y_top <- ndgr_y_top - deslocamento_20
-  ndgr_y_top <- max(1, ndgr_y_top)
-  ndgr_y_top <- min(ndgr_y_top, dim(combined_array)[1] - (7 * escala + 4))
-
-  lab1 <- draw_white_label(combined_array, ndgr_center_x, ndgr_y_top, texto_solo, escala = escala)
-  combined_array <- lab1$arr
-
-  # ====== Legenda NDGR (CAIXA 2) — agora ABAIXO da caixa SOLO ======
-  texto_ndgr <- sprintf("NDGR: %.2f", NDGR_m)
-  margem_v <- 6
-  ndgr2_y_top <- lab1$bbox["y1"] + margem_v
-  # impede de sair da imagem
-  ndgr2_y_top <- min(ndgr2_y_top, dim(combined_array)[1] - (7 * escala + 4))
-  # se por algum motivo ficar colado/por cima, força +1 px
-  if (ndgr2_y_top <= lab1$bbox["y1"]) {
-    ndgr2_y_top <- min(lab1$bbox["y1"] + 1, dim(combined_array)[1] - (7 * escala + 4))
-  }
-  lab2 <- draw_white_label(combined_array, ndgr_center_x, ndgr2_y_top, texto_ndgr, escala = escala)
-  combined_array <- lab2$arr
-
-  # ====== Fim das legendas ======
-  combined_image <- Image(combined_image <- combined_array, colormode = Color)
-  img_list$imagem_final_overlay <- combined_image
+  combined_image <- overlay_image
+  img_list$Imagem_final <- combined_image
   setTxtProgressBar(pb, 7)
 
   if (dim(combined_image)[1] < dim(combined_image)[2]) {
     combined_image <- rotate(combined_image, angle = angulo)
   }
   display(combined_image, method = "raster")
-  setTxtProgressBar(pb, 8)
 
+  grid.text(
+    label = sprintf("SOLO EXPOSTO: %.1f%%", img_list$solo_exp * 100),
+    x = unit(0.985, "npc"),
+    y = unit(0.96, "npc"),
+    just = c("right", "top"),
+    gp = gpar(col = "black", fontsize = 10, fontface = "bold")
+  )
+  grid.text(
+    label = sprintf("NDGR: %.2f", NDGR_m),
+    x = unit(0.985, "npc"),
+    y = unit(0.925, "npc"),
+    just = c("right", "top"),
+    gp = gpar(col = "black", fontsize = 10, fontface = "bold")
+  )
+
+  pal <- grDevices::colorRampPalette(c("darkred", "red", "yellow", "orange", "lightgreen", "darkgreen", "blue", "darkblue"))(100)
+  bar_width <- unit(0.25, "npc")
+  bar_height <- unit(0.02, "npc")
+  x_offset <- unit(0.73, "npc")
+  y_offset <- unit(0.88, "npc")
+
+  pushViewport(viewport(x = x_offset, y = y_offset, width = bar_width, height = bar_height, just = c("left", "bottom")))
+  n <- length(pal)
+  for (i in seq_len(n)) {
+    grid.rect(x = unit(i / n, "npc"),
+              y = unit(0.5, "npc"),
+              width = unit(1 / n, "npc"),
+              height = unit(1, "npc"),
+              gp = gpar(col = NA, fill = pal[i]),
+              just = c("center", "center"))
+  }
+  pos_marker <- (NDGR_m + 1) / 2
+  pos_marker <- max(min(pos_marker, 1), 0)
+  grid.lines(x = unit(c(pos_marker, pos_marker), "npc"),
+             y = unit(c(0, 1), "npc"),
+             gp = gpar(col = "white", lwd = 2))
+  popViewport()
+
+  setTxtProgressBar(pb, 8)
   close(pb)
   message("Processamento concluído.")
   return(img_list)

@@ -4,7 +4,7 @@
 \alias{process_img}
 \title{Função para processamento de imagens RGB}
 \usage{
-process_img(file_path, max_pixels = 5e+06, angulo = 0)
+process_img(file_path, max_pixels = 5e+06, angulo = 0, escala = 3)
 }
 \arguments{
 \item{file_path}{Caminho do arquivo de imagem (formato suportado pelo EBImage).

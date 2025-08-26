@@ -34,9 +34,11 @@ Para obter bons resultados, priorize **imagens bem iluminadas, nítidas e sem so
 
 <h2 align="center">Exemplo visual de captura </h2>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/exemplo.png" alt="Exemplo de captura" width="72%">
-</p>
+<div style="width: 100%; margin: auto; text-align: center;">
+  <img src="https://raw.githubusercontent.com/wilhanvalasco/CampoPixel/main/inst/exdata/exemplo.png" alt="Exemplo de captura" width="196%">
+</div>
+
+
 
 ---
 
@@ -73,9 +75,11 @@ As principais saídas são o **NDGR** e o **percentual de solo exposto**.
 O **NDGR** (*Normalized Difference Green-Red Index*) é um índice espectral que mede a diferença relativa entre os canais **verde (G)** e **vermelho (R)** da imagem.  
 Sua fórmula é:
 
+
 \[
 NDGR = \frac{G - R}{G + R}
 \]
+
 
 - **G**: intensidade da banda verde.  
 - **R**: intensidade da banda vermelha.  
@@ -106,12 +110,38 @@ Esse indicador é fundamental para estudos de **cobertura vegetal, erosão e pr�
 
 ---
 
-### 3. **Resumo Técnico**
+### 3. **Resumo Técnico: `process_img()`**
 
-| Saída do `process_im()` | Significado                          | Método de Cálculo                        |
-|--------------------------|--------------------------------------|------------------------------------------|
-| **NDGR**                 | Índice verde–vermelho normalizado    | \((G - R) / (G + R)\) com bandas RGB     |
-| **Solo (%)**             | Percentual de solo exposto           | Segmentação de pixels RGB em solo/vegetação |
+| Parâmetro / Saída        | Significado                                    | Método / Descrição                                                              |
+|--------------------------|------------------------------------------------|---------------------------------------------------------------------------------|
+| `true_color`             | Imagem original                                | RGB sem redimensionamento, rotação ou filtros                                   |
+| `NDGR`                   | Índice verde–vermelho normalizado              | \((G - R) / (G + R)\) com bandas RGB                                            |
+| `im_binary`              | Segmentação binária                            | Máscara onde pixels com vegetação são 1, solo é `NA`                            |
+| `solo_exp`               | Percentual de solo exposto                     | Proporção de pixels com valor `NA` em `im_binary`                               |
+| `rgb_map`                | Mapa colorido do NDGR                          | Gradiente de cor aplicado aos valores de NDGR segmentados                       |
+| `NDGR_medio`             | Valor médio do NDGR                            | Média dos valores válidos de NDGR após segmentação                              |
+| `Imagem_final`           | Imagem sobreposta com gradiente NDGR           | Combinação da imagem original com o mapa NDGR colorido                          |
+
+---
+
+### 4. **Resumo Técnico: `crop_im()`**
+
+| Parâmetro / Saída     | Significado                                   | Método / Descrição                                                                  |
+|------------------------|----------------------------------------------|-------------------------------------------------------------------------------------|
+| `x`                    | Imagem de entrada                            | Pode ser um objeto `Image` ou caminho para arquivo                                  |
+| `n_points`             | Número de vértices                           | Define interativamente o polígono de recorte (mínimo de 3 pontos)                   |
+| `display.it`           | Exibir resultado ao final                    | Valor lógico (`TRUE` ou `FALSE`)                                                    |
+| **Retorno**            | Imagem RGB recortada                         | Recorte da menor caixa delimitadora que contém o polígono desenhado                 |
+
+---
+
+### 5. **Resumo Técnico: `resize_im()`**
+
+| Parâmetro / Saída     | Significado                                   | Método / Descrição                                                                  |
+|------------------------|----------------------------------------------|-------------------------------------------------------------------------------------|
+| `x`                    | Imagem de entrada                            | Pode ser um objeto `Image` ou caminho para arquivo                                  |
+| `percentual`           | Percentual de escala                         | Valor numérico entre 1 e 100; define a nova proporção da imagem                     |
+| **Retorno**            | Imagem RGB redimensionada                    | Imagem reduzida proporcionalmente com base no percentual informado                  |
 
 ---
 
@@ -134,6 +164,12 @@ Processa uma imagem RGB, calcula índices (ex.: NDGR) e estima métricas como **
 crop_im()
 
 Recorta uma região de interesse para análises locais ou para padronizar áreas entre múltiplas imagens.
+```
+
+```r 
+resize_im()
+
+Reduz a imagem original para uma porcentagem da dimensão, mantendo a proporção entre largura e altura.
 ```
 
 ### Exemplos

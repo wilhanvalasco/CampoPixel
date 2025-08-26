@@ -38,7 +38,7 @@ crop_im <- function(x, display.it = TRUE, n_points = 4) {
     stop("Pacote 'EBImage' é necessário. Instale com BiocManager::install('EBImage').")
   }
   if (n_points < 3) stop("'n_points' deve ser >= 3.")
-  
+
   # ---- carregar imagem ----
   if (inherits(x, "Image")) {
     img <- x
@@ -48,7 +48,7 @@ crop_im <- function(x, display.it = TRUE, n_points = 4) {
   } else {
     stop("Forneça um EBImage::Image ou um caminho de arquivo existente.")
   }
-  
+
   # garantir 3 canais (RGB)
   if (length(dim(img)) == 2) {
     g <- EBImage::imageData(img)
@@ -57,16 +57,16 @@ crop_im <- function(x, display.it = TRUE, n_points = 4) {
     img <- img[,,1:3]
   }
   EBImage::colorMode(img) <- EBImage::Color
-  
+
   w <- dim(img)[1]; h <- dim(img)[2]
-  
+
   # ---- helpers ----
   polygon_area <- function(x, y) {
     n <- length(x)
     s <- sum(x[-1] * y[-n] - x[-n] * y[-1]) + (x[n] * y[1] - x[1] * y[n])
     abs(s) / 2
   }
-  
+
   pip_vec <- function(px, py, vx, vy) {
     n <- length(vx)
     inside <- rep(FALSE, length(px))
@@ -80,14 +80,14 @@ crop_im <- function(x, display.it = TRUE, n_points = 4) {
     }
     inside
   }
-  
+
   # ---- coleta interativa ----
   op <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(op), add = TRUE)
-  
+
   EBImage::display(img, method = "raster")
   usr <- graphics::par("usr")
-  
+
   redraw <- function(pts_user) {
     EBImage::display(img, method = "raster")
     if (nrow(pts_user) > 0) {
@@ -95,7 +95,7 @@ crop_im <- function(x, display.it = TRUE, n_points = 4) {
       if (nrow(pts_user) > 1) graphics::lines(pts_user$x, pts_user$y, lwd = 2)
     }
   }
-  
+
   to_pixel <- function(xu, yu, usr, w, h) {
     xpx <- (xu - usr[1]) / (usr[2] - usr[1]) * (w - 1) + 1
     if (usr[4] < usr[3]) {
@@ -105,7 +105,7 @@ crop_im <- function(x, display.it = TRUE, n_points = 4) {
     }
     cbind(x = xpx, y = ypx)
   }
-  
+
   pts_user <- data.frame(x = numeric(0), y = numeric(0))
   for (i in seq_len(n_points)) {
     pt <- graphics::locator(1)
@@ -116,43 +116,44 @@ crop_im <- function(x, display.it = TRUE, n_points = 4) {
   # fecha visualmente
   graphics::lines(c(pts_user$x, pts_user$x[1]),
                   c(pts_user$y, pts_user$y[1]), lwd = 2, lty = 2)
-  
+
   # coords em pixels
   px <- to_pixel(pts_user$x, pts_user$y, usr, w, h)
   coords <- data.frame(x = px[, "x"], y = px[, "y"])
-  
+
   # valida polígono
   if (polygon_area(coords$x, coords$y) <= 0) {
     stop("Os pontos não formam um polígono válido.")
   }
-  
+
   # ---- máscara poligonal no tamanho da imagem ----
   gx <- rep(1:w, times = h)
   gy <- rep(1:h, each = w)
   inside <- pip_vec(gx, gy, coords$x, coords$y)
   mask <- matrix(as.numeric(inside), nrow = w, ncol = h)  # [x,y]
-  
+
   # aplica máscara por canal (RGB)
   imagem <- img
   for (k in 1:dim(imagem)[3]) {
     imagem[,,k] <- img[,,k] * mask
   }
-  
+
   # ---- recorte ao bounding box ----
   x_min <- max(1, floor(min(coords$x))); x_max <- min(w, ceiling(max(coords$x)))
   y_min <- max(1, floor(min(coords$y))); y_max <- min(h, ceiling(max(coords$y)))
   imagem <- imagem[x_min:x_max, y_min:y_max, ]
-  
+
   # alfa recortado como atributo
   alpha <- EBImage::Image(mask, dim = c(w, h))
   EBImage::colorMode(alpha) <- EBImage::Grayscale
   alpha <- alpha[x_min:x_max, y_min:y_max]
   attr(imagem, "alpha") <- alpha
-  
+
   if (isTRUE(display.it)) {
     EBImage::display(imagem, method = "raster")
   }
   return(imagem)
 }
+
 
 
