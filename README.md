@@ -146,6 +146,7 @@ Esse indicador é fundamental para estudos de **cobertura vegetal, erosão e pr�
 ---
 
 <h2 align="center">Configurações do `CampoPixel` </h2>
+
 ```r
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("wilhanvalasco/CampoPixel")
