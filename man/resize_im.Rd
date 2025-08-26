@@ -2,32 +2,37 @@
 % Please edit documentation in R/resize_im.R
 \name{resize_im}
 \alias{resize_im}
-\title{Reduz a imagem por um percentual (downscale)}
+\title{Redimensionamento proporcional de imagem RGB}
 \usage{
 resize_im(x, percentual)
 }
 \arguments{
-\item{x}{Objeto \code{EBImage::Image} ou caminho para arquivo de imagem.}
+\item{x}{Objeto de imagem (classe \code{Image}) ou caminho para o arquivo.}
 
-\item{percentual}{(\code{numeric}) Percentual desejado (1 a 100).}
+\item{percentual}{Valor numérico entre 1 e 100 representando o percentual de escala desejado.}
 }
 \value{
-Um \code{EBImage::Image} redimensionado. Atributos úteis:
-\itemize{
-\item \code{attr(img, "scale_factor")} (fator aplicado, ex.: 0.5)
-\item \code{attr(img, "orig_dim")} e \code{attr(img, "new_dim")}
-\item Se houver \code{attr(x, "alpha")}, ele é redimensionado e reaplicado.
-}
+Uma imagem RGB redimensionada. A função preserva atributos como dimensões originais e fator de escala.
 }
 \description{
-Redimensiona a imagem para o percentual informado (mantendo proporção).
-Ex.: \code{percentual = 50} reduz para 50\% da largura e altura.
+Reduz a imagem original para uma porcentagem da dimensão, mantendo a proporção entre largura e altura.
+}
+\details{
+\itemize{
+\item A imagem é redimensionada proporcionalmente com base no percentual informado.
+\item Caso o objeto original possua atributos adicionais (como máscara), eles são reescalados junto.
+}
 }
 \examples{
 \donttest{
-# im <- EBImage::readImage("foto.jpg")
-# im_small <- resize_im(im, 50)  # 50\% do tamanho
-# EBImage::display(im_small, method = "raster")
+# Carregar imagem
+img <- readImage(system.file("images", "sample.png", package = "EBImage"))
+
+# Reduzir para 40\% do tamanho
+img_red <- resize_im(img, 40)
+
+# Exibir imagem resultante
+display(img_red, method = "raster")
 }
 
 }

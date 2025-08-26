@@ -76,9 +76,10 @@ O **NDGR** (*Normalized Difference Green-Red Index*) é um índice espectral que
 Sua fórmula é:
 
 
-\[
+$$
 NDGR = \frac{G - R}{G + R}
-\]
+$$
+
 
 
 - **G**: intensidade da banda verde.  

@@ -2,45 +2,41 @@
 % Please edit documentation in R/crop_im.R
 \name{crop_im}
 \alias{crop_im}
-\title{Recorte poligonal interativo para imagens RGB (EBImage)}
+\title{Recorte interativo por polígono em imagem RGB}
 \usage{
 crop_im(x, display.it = TRUE, n_points = 4)
 }
 \arguments{
-\item{x}{Objeto \code{EBImage::Image} ou caminho para arquivo de imagem.}
+\item{x}{Objeto de imagem RGB (classe \code{Image}) ou caminho para o arquivo.}
 
-\item{display.it}{(\code{logical}) Se \code{TRUE}, exibe o recorte ao final.
-Padrão: \code{TRUE}.}
+\item{display.it}{Lógico. Se \code{TRUE}, exibe o recorte ao final. Padrão: \code{TRUE}.}
 
-\item{n_points}{(\code{integer}) Número de pontos a coletar interativamente.
-Padrão: \code{4}. Deve ser \code{>= 3}.}
+\item{n_points}{Número de pontos (vértices) a serem definidos interativamente. Mínimo: 3.}
 }
 \value{
-Um \code{EBImage::Image} (RGB) recortado. A máscara alfa correspondente é
-retornada em \code{attr(imagem, "alpha")} como \code{EBImage::Image}
-em escala de cinza (1 dentro do polígono; 0 fora).
+Uma imagem RGB recortada com base no polígono definido.
 }
 \description{
-Realiza recorte \strong{poligonal} sobre uma imagem exibida via
-\code{EBImage::display(method = "raster")}. Você clica \code{n_points}
-vértices (mínimo 3) e a função devolve a imagem recortada (RGB),
-anexando o \strong{canal alfa} (máscara binária do polígono) em
-\code{attr(img_recorte, "alpha")}.
+Esta função permite o recorte interativo de uma região poligonal sobre uma imagem RGB.
+O usuário define os vértices com cliques do mouse, e a função retorna a imagem recortada.
 }
 \details{
 \itemize{
-\item Cria uma máscara poligonal (ray casting) no tamanho da imagem e aplica
-canal a canal (RGB).
-\item A saída é reduzida ao retângulo mínimo que contém o polígono (bounding box).
-\item O \code{display()} não mostra transparência; o alfa é retornado como atributo.
+\item A máscara do polígono é criada com algoritmo de "ray casting".
+\item O recorte corresponde à menor caixa delimitadora (bounding box) que contém o polígono.
+\item A função requer ambiente gráfico e interação com o usuário via mouse.
 }
 }
 \examples{
 \donttest{
-# im <- EBImage::readImage("sua_imagem.jpg")
-# rec <- crop_im(im, n_points = 4, display.it = TRUE)
-# EBImage::display(rec, method = "raster")
-# EBImage::display(attr(rec, "alpha"), method = "raster")
+# Carregar imagem
+img <- EBImage::readImage(system.file("images", "sample.png", package = "EBImage"))
+
+# Realizar recorte com 5 pontos
+recorte <- crop_im(img, n_points = 5, display.it = TRUE)
+
+# Exibir resultado
+EBImage::display(recorte, method = "raster")
 }
 
 }

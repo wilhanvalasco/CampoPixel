@@ -2,45 +2,63 @@
 % Please edit documentation in R/process_img.R
 \name{process_img}
 \alias{process_img}
-\title{Função para processamento de imagens RGB}
+\title{Função para processamento de imagens RGB com segmentação de solo.}
 \usage{
-process_img(file_path, max_pixels = 5e+06, angulo = 0, escala = 3)
+process_img(imagem, max_pixels = 5e+06, angulo = 0, size_filter = 5)
 }
 \arguments{
-\item{file_path}{Caminho do arquivo de imagem (formato suportado pelo EBImage).
-Caso não seja fornecido, a função pode utilizar uma imagem já carregada em memória.}
+\item{imagem}{Caminho para o arquivo de imagem (formato suportado pelo EBImage) ou
+um objeto do tipo Image já carregado. A função detecta automaticamente o tipo.}
 
 \item{max_pixels}{Número máximo de pixels permitido para a imagem
-(padrão = 5e6). Imagens maiores serão redimensionadas proporcionalmente
-para reduzir o uso de memória e tempo de processamento.}
+(padrão = 5e6). Imagens maiores são redimensionadas proporcionalmente para
+reduzir o uso de memória e o tempo de processamento.}
 
 \item{angulo}{Ângulo de rotação aplicado à imagem em graus
-(padrão = 0, sem rotação).}
+(padrão = 0, sem rotação). Útil para ajustar a orientação.}
+
+\item{size_filter}{Tamanho do filtro da mediana (padrão = 5). Valores maiores
+suavizam mais a imagem.}
+}
+\value{
+Uma lista contendo:
+\itemize{
+\item \code{true_color} - Imagem original (sem redimensionamento, rotação ou filtro).
+\item \code{NDGR} - Matriz do Índice de Diferença Normalizada Verde-Vermelho.
+\item \code{im_binary} - Imagem binária segmentada com base no NDGR.
+\item \code{solo_exp} - Porcentagem de solo exposto na imagem (entre 0 e 1).
+\item \code{rgb_map} - Mapa colorido representando o NDGR segmentado.
+\item \code{NDGR_medio} - Valor médio do NDGR considerando apenas os pixels segmentados.
+\item \code{Imagem_final} - Imagem final com sobreposição do gradiente NDGR.
+}
 }
 \description{
 Esta função processa imagens RGB obtidas por diferentes dispositivos
-(celular, drone ou satélite) e retorna o Índice de Diferença Normalizada
-Verde-Vermelho (NDGR) e o percentual de solo exposto na imagem.
+(celular, drone ou satélite) e retorna métricas relacionadas ao índice NDGR
+(Índice de Diferença Normalizada Verde-Vermelho) e à segmentação do solo exposto.
+}
+\details{
+A função depende dos seguintes pacotes: EBImage, scales, parallel, abind, grid, grDevices.
+Esses pacotes são automaticamente carregados ao executar a função.
 }
 \examples{
-# Exemplo de uso da função process_img()
+# Carregue a imagem diretamente ou informe o caminho
+im <- EBImage::readImage(system.file("images", "sample.png", package = "EBImage"))
 
-# Defina o caminho da pasta onde a imagem está localizada
-caminho <- "caminho/para/sua/pasta"
-setwd(caminho)
-
-# Liste os arquivos disponíveis na pasta
-dir(caminho)
-
-# Leia uma imagem RGB (exemplo com nome fictício)
-im <- readImage("exemplo_imagem.JPG")
+# Execute o processamento (sem redimensionamento e com filtro 3x3)
+resultado <- process_img(imagem = im, angulo = 0, size_filter = 3)
 
 # Visualize a imagem original
-display(im, method = "r")
+EBImage::display(resultado$true_color, method = "raster")
 
-# Processe a imagem com rotação de -90 graus
-resultado <- process_img("exemplo_imagem.JPG", angulo = -90)
+# Visualize a imagem final com gradiente NDGR
+EBImage::display(resultado$Imagem_final, method = "raster")
 
-# O objeto 'resultado' conterá o NDGR e o percentual de solo exposto
+# Acesse os resultados:
+resultado$NDGR # Matriz NDGR
+resultado$im_binary # Máscara binária do solo exposto
+resultado$solo_exp # Proporção de solo exposto
+resultado$rgb_map # Mapa colorido
+resultado$NDGR_medio # NDGR médio da imagem
 
 }
