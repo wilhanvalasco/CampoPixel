@@ -1,35 +1,34 @@
-#' Recorte poligonal interativo para imagens RGB (EBImage)
+#' Recorte interativo por polígono em imagem RGB
 #'
-#' @description
-#' Realiza recorte **poligonal** sobre uma imagem exibida via
-#' \code{EBImage::display(method = "raster")}. Você clica \code{n_points}
-#' vértices (mínimo 3) e a função devolve a imagem recortada (RGB),
-#' anexando o **canal alfa** (máscara binária do polígono) em
-#' \code{attr(img_recorte, "alpha")}.
+#' Esta função permite o recorte interativo de uma região poligonal sobre uma imagem RGB.
+#' O usuário define os vértices com cliques do mouse, e a função retorna a imagem recortada.
 #'
-#' @param x Objeto \code{EBImage::Image} ou caminho para arquivo de imagem.
-#' @param display.it (\code{logical}) Se \code{TRUE}, exibe o recorte ao final.
-#'   Padrão: \code{TRUE}.
-#' @param n_points (\code{integer}) Número de pontos a coletar interativamente.
-#'   Padrão: \code{4}. Deve ser \code{>= 3}.
-#'
-#' @details
-#' - Cria uma máscara poligonal (ray casting) no tamanho da imagem e aplica
-#'   canal a canal (RGB).
-#' - A saída é reduzida ao retângulo mínimo que contém o polígono (bounding box).
-#' - O \code{display()} não mostra transparência; o alfa é retornado como atributo.
+#' @param x Objeto de imagem RGB (classe `Image`) ou caminho para o arquivo.
+#' @param display.it Lógico. Se `TRUE`, exibe o recorte ao final. Padrão: `TRUE`.
+#' @param n_points Número de pontos (vértices) a serem definidos interativamente. Mínimo: 3.
 #'
 #' @return
-#' Um \code{EBImage::Image} (RGB) recortado. A máscara alfa correspondente é
-#' retornada em \code{attr(imagem, "alpha")} como \code{EBImage::Image}
-#' em escala de cinza (1 dentro do polígono; 0 fora).
+#' Uma imagem RGB recortada com base no polígono definido.
+#'
+#' @details
+#' - A máscara do polígono é criada com algoritmo de "ray casting".
+#' - O recorte corresponde à menor caixa delimitadora (bounding box) que contém o polígono.
+#' - A função requer ambiente gráfico e interação com o usuário via mouse.
+#'
+#' @importFrom EBImage readImage display getFrame Image
+#' @importFrom graphics locator polygon rect par
+#' @importFrom grDevices dev.flush
 #'
 #' @examples
 #' \donttest{
-#' # im <- EBImage::readImage("sua_imagem.jpg")
-#' # rec <- crop_im(im, n_points = 4, display.it = TRUE)
-#' # EBImage::display(rec, method = "raster")
-#' # EBImage::display(attr(rec, "alpha"), method = "raster")
+#' # Carregar imagem
+#' img <- EBImage::readImage(system.file("images", "sample.png", package = "EBImage"))
+#'
+#' # Realizar recorte com 5 pontos
+#' recorte <- crop_im(img, n_points = 5, display.it = TRUE)
+#'
+#' # Exibir resultado
+#' EBImage::display(recorte, method = "raster")
 #' }
 #'
 #' @export
