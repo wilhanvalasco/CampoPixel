@@ -150,7 +150,6 @@ Esse indicador é fundamental para estudos de **cobertura vegetal, erosão e pr�
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("wilhanvalasco/CampoPixel")
 library(CampoPixel)
-
 ```
 
 ### Funções
